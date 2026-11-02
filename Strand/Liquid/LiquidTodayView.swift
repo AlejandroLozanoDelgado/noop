@@ -634,6 +634,8 @@ struct LiquidTodayView: View {
                     .nativeLiquidGlassHeaderButton()
                     .accessibilityLabel("Customize Today")
                 }
+                // One container for the cluster's glass (avatar, add, battery/sync, customize).
+                .noopGlassGroup()
                 .background(
                     GeometryReader { proxy in
                         Color.clear.preference(

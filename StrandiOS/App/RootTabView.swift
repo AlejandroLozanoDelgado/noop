@@ -351,10 +351,7 @@ struct RootTabView: View {
             // transparent nav bar keeps it edge-to-edge instead of an opaque band clipping the top on scroll.
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { routedPillar = nil }
-                        .foregroundStyle(StrandPalette.accent)
-                }
+                SheetCloseToolbarItem { routedPillar = nil }
             }
         }
     }
@@ -404,10 +401,7 @@ struct RootTabView: View {
                 // Hiding the bar background lets the sky stay continuous under the floating Done button.
                 .toolbarBackground(.hidden, for: .navigationBar)
                 .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Done") { quickAction = nil }
-                            .foregroundStyle(StrandPalette.accent)
-                    }
+                    SheetCloseToolbarItem { quickAction = nil }
                 }
         }
     }
@@ -423,10 +417,7 @@ struct RootTabView: View {
                 // nav bar keeps it edge-to-edge instead of an opaque band clipping the top on scroll.
                 .toolbarBackground(.hidden, for: .navigationBar)
                 .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Done") { showDevices = false }
-                            .foregroundStyle(StrandPalette.accent)
-                    }
+                    SheetCloseToolbarItem { showDevices = false }
                 }
         }
     }
@@ -588,6 +579,40 @@ struct RootTabView: View {
                         .clipShape(RoundedRectangle(cornerRadius: NoopMetrics.cardRadius, style: .continuous))
                 }
             }
+        }
+    }
+}
+
+/// The dismiss control for the shell's sheets (quick actions, Devices, v5 pillars). iOS 26 shows the system
+/// Close button (xmark, Liquid Glass) in the leading cancellation slot, the platform idiom for an
+/// informational sheet. Earlier releases keep the accent "Done" text button on the trailing edge.
+/// The availability check is fixed for the life of the process, so the placement never flips at runtime.
+private struct SheetCloseToolbarItem: ToolbarContent {
+    let action: () -> Void
+
+    init(action: @escaping () -> Void) { self.action = action }
+
+    var body: some ToolbarContent {
+        ToolbarItem(placement: Self.placement) {
+            SheetCloseButton(action: action)
+        }
+    }
+
+    private static var placement: ToolbarItemPlacement {
+        if #available(iOS 26.0, *) { return .cancellationAction }
+        return .topBarTrailing
+    }
+}
+
+private struct SheetCloseButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        if #available(iOS 26.0, *) {
+            Button(role: .close) { action() }
+        } else {
+            Button("Done") { action() }
+                .foregroundStyle(StrandPalette.accent)
         }
     }
 }

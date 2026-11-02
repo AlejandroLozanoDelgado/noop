@@ -372,6 +372,8 @@ struct LiveWorkoutView: View {
             Spacer(minLength: NoopMetrics.space2)
             endWorkoutGlassButton
         }
+        // One container for the three glass controls (delete, pause, end).
+        .noopGlassGroup()
         .padding(Self.bottomBarInset)
         .background {
             NoopPanelSurface(cornerRadius: NoopVisualStyle.pillRadius, elevated: true)

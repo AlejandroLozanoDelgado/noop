@@ -71,12 +71,10 @@ struct LiftSessionView: View {
     var body: some View {
         Group {
             if let engine {
-                VStack(spacing: 0) {
-                    sheet(engine)
-                    // The control bar never scrolls away: at the rack the clock and the one action have to
-                    // be where your thumb already is.
-                    controlBar(engine)
-                }
+                // The control bar never scrolls away: at the rack the clock and the one action have to
+                // be where your thumb already is. On iOS 26 it is a system bar with the scroll edge effect.
+                sheet(engine)
+                    .noopPinnedBottomBar { controlBar(engine) }
             } else {
                 ComingSoon(what: "No session running", symbol: "dumbbell")
             }
@@ -569,10 +567,7 @@ struct LiftSessionView: View {
         .padding(.horizontal, NoopMetrics.screenPadding)
         .padding(.top, 10)
         .padding(.bottom, 14)
-        .background(.ultraThinMaterial)
-        .overlay(alignment: .top) {
-            Rectangle().fill(StrandPalette.textTertiary.opacity(0.15)).frame(height: 0.5)
-        }
+        // Surface (material + hairline, or the iOS 26 scroll edge effect) comes from `noopPinnedBottomBar`.
     }
 
     /// Live heart rate, beside the clocks that are already pinned above the action button.
